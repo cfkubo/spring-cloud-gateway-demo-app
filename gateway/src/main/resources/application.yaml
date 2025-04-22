@@ -1,0 +1,29 @@
+server:
+  port: 8080
+  http2:
+    enabled: true
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: password
+    key-store-type: PKCS12
+
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        ssl:
+          trustedX509Certificates:
+            - classpath:certificate.pem
+      routes:
+        - id: json-hello
+          uri: https://localhost:9090
+          predicates:
+            - Path=/hello/**
+          filters:
+            - name: JsonToGrpc
+              args:
+                protoDescriptor: classpath:hello.pb
+                protoFile: classpath:hello.proto
+                service: HelloWorldService
+                method: sayHello
